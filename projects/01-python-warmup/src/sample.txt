@@ -483,7 +483,7 @@ You're ready for module 02 when you can, without looking things up:
 - Scaffold a project with `uv`, add a dependency and a dev dependency, and explain what `uv.lock` and `uv sync --frozen` do.
 - Explain why a type annotation does *not* prevent a runtime type error in Python, and what does.
 - Write a typed function with a keyword-only argument and a `str | None` return, and know why `X | None` matters.
-- Choose correctly between `@dataclass` and a pydantic `BaseModel` for a given piece of data, and explain why: use a `@dataclass` for trusted in-memory values where you want immutable/value-style semantics and simple generated methods; use a pydantic `BaseModel` at trust boundaries (config, API payloads, env vars, model output) because it validates and coerces input and raises a `ValidationError` before bad data enters your core logic.
+- Choose correctly between `@dataclass` and a pydantic `BaseModel` for a given piece of data, and say why.
 - Rewrite a LINQ `Where/Select/ToDictionary` chain as a Python comprehension, and turn a list comprehension into a streaming generator.
 - Explain what `with` guarantees and why you pass `encoding="utf-8"`.
 - Say what `async` does and does not buy you in Python versus `Task` in C#.
