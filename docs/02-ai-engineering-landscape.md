@@ -184,6 +184,7 @@ import json
 import os
 
 import boto3   # the AWS SDK for Python
+from botocore.config import Config
 
 
 def main() -> int:
@@ -191,7 +192,14 @@ def main() -> int:
     model_id = os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0")
     region = os.environ.get("AWS_REGION", "us-east-1")
 
-    client = boto3.client("bedrock-runtime", region_name=region)
+    # `mode="adaptive"` makes boto3 catch Bedrock's ThrottlingException, back off,
+    # and retry for you — instead of surfacing "too many requests" on the first
+    # burst. This is the fix for rate limiting; see the throttling note below.
+    client = boto3.client(
+        "bedrock-runtime",
+        region_name=region,
+        config=Config(retries={"max_attempts": 8, "mode": "adaptive"}),
+    )
 
     # Bedrock's "Converse" API gives one consistent shape across model families.
     response = client.converse(
@@ -253,7 +261,39 @@ You just used the AWS component you'll lean on for the rest of the series: **Ama
 - Bedrock is a single API in front of *many* model families (Anthropic, Meta Llama, Amazon's own, and others). You pick a `modelId`; AWS runs the GPUs. It's the "hosted API" box from the stack diagram, delivered as an AWS service.
 - Its **Converse API** normalizes the request/response shape across those families, so switching models is mostly a config change — useful when you're comparing models on cost/quality later.
 - Auth is standard **IAM**, not a bespoke API key: your service assumes a role with permission to invoke a model. This is the same auth story as any other AWS call you've made, which is exactly why AWS is our pretend-prod target — the surrounding machinery is stuff you already know.
-- Billing is per-token, visible in Cost Explorer. Set a budget alarm early (module 13); it's easy to leave a loop running.
+- Billing is per-token, visible in Cost Explorer. Set a budget alarm early (module 13); it's easy to leave a loop running. **A budget is a spend *alarm* only — it does not grant, cap, or unblock capacity, so it has nothing to do with the throttling below.**
+
+#### Model access (auto-enabled) and the Anthropic first-use form
+
+AWS **retired the old "Model access" enablement page**. Serverless foundation models — including Amazon's own **Nova** family — are now **auto-enabled on first invocation** in your account, per commercial region. So a `converse` call to Nova Micro needs no access step; just call it.
+
+Two exceptions worth knowing:
+
+- **Anthropic (Claude) models:** first-time users may have to submit a short **use-case details** form before the model will respond (open the model in the Bedrock **Model catalog** and it prompts you). This is the most common cause of a confusing first-call rejection on Claude specifically.
+- **AWS Marketplace models:** a user with Marketplace permissions must invoke the model once to enable it account-wide.
+
+Admins still restrict access via **IAM policies** and **Service Control Policies** — that's now the only access lever, not a console toggle.
+
+#### Throttling and service quotas (the real "too many requests" fix)
+
+A `ThrottlingException` / "too many requests" is **rate limiting**, not a spend or access problem. Every account has per-region **quotas** for each model: requests-per-minute (RPM) and tokens-per-minute (TPM). Fresh accounts start with modest defaults. The fixes, in order:
+
+1. **Retries with backoff** — the `Config(retries={"max_attempts": 8, "mode": "adaptive"})` above. boto3 catches the throttle, waits, and retries. For a learning loop this alone is almost always enough.
+2. **Use `us-east-1`** — quotas are per-region, and `us-east-1` generally has the highest Bedrock defaults. Switching regions can give more headroom than a quota request.
+3. **Request a quota increase** — only if you're still throttled after (1) and (2). This is the **Service Quotas** console, a separate system from billing:
+   - Service Quotas → **AWS services** → **Amazon Bedrock** → find e.g. *"On-demand model inference requests per minute for Amazon Nova Micro"* → **Request increase at account level**.
+   - Or from the CLI:
+     ```bash
+     # find the quota code and current value
+     aws service-quotas list-service-quotas --service-code bedrock --region us-east-1 \
+       --query "Quotas[?contains(QuotaName, 'Nova Micro')].[QuotaName,QuotaCode,Value]" --output table
+     # request an increase using the QuotaCode from above
+     aws service-quotas request-service-quota-increase \
+       --service-code bedrock --quota-code L-XXXXXXXX --desired-value 10 --region us-east-1
+     ```
+   Small increases are often auto-approved in minutes; larger ones route to a human.
+
+Mental model from your backend world: a **budget** is your billing alert, **throttling** is a `429`, and a **quota increase** is raising the `429` ceiling. Raising the billing alert never changes the `429`.
 
 You don't deploy anything to AWS in this module — the script runs locally against Bedrock. But you've now placed the model layer of the stack onto a concrete AWS service, and every later module builds on that.
 
@@ -275,15 +315,25 @@ You're ready for module 03 when you can:
 - State the "mostly normal software, one probabilistic component" model and list three concrete consequences it has for how you build and test.
 - Give a first-pass build-vs-buy and hosted-vs-open recommendation for a described feature, with reasons.
 - Write an ADR for an AI feature that includes a "how we'll know it's good" section.
-- Run the hello-model script in Docker against Bedrock and explain why credentials are passed as env vars, not baked into the image.
+- Run the hello-model script in Docker against Bedrock and explain why credentials are passed as env vars, not baked into the image. `Ans: why it's a risk`:
+  * A tight one-liner: `"Image layers are immutable and widely distributed, so a baked-in secret persists in the layer history and leaks wherever the image travels — inject it at runtime instead, decoupled from the image's lifecycle."`
+  * Docker images are layered and immutable. If you COPY an .env into the image, the secret is baked into a layer permanently — deleting the file in a later layer doesn't remove it; anyone who does docker history or unpacks the layers can pull it out.
+  * Images get shared. They're pushed to registries (ECR, Docker Hub), pulled onto CI runners, dev laptops, prod hosts. A secret in the image now leaks everywhere the image goes.
+  * The image is the wrong lifecycle for a secret. Credentials rotate; the image shouldn't have to rebuild every time they do. Env vars (or better, an IAM role / secrets manager) are injected at runtime, so the same image runs everywhere and the secret stays external.
 - Say in one sentence what AWS Bedrock is and how its auth differs from a raw API key.
+  * A tight one-liner: `"Bedrock is AWS's managed, multi-model API where you invoke a model by ID and AWS runs the GPUs; auth is standard IAM — your service assumes a role with invoke permission and signs requests with short-lived credentials — rather than a static, long-lived provider API key in a header."`
+  * Raw provider API → a bearer API key: a long-lived static secret you put in a header. You hold it, you must store/rotate it, and anyone with the string can call the model.
+  * Bedrock → AWS IAM: no key at all. Your service assumes a role with an `bedrock:InvokeModel` permission, and calls are signed with short-lived, automatically-rotated credentials (SigV4). Access is governed by IAM policies / SCPs, audited in CloudTrail, and scoped like any other AWS call.
 
 ## Going deeper
 
 Topics and search terms (verify current details against provider docs — this layer moves fast):
 
 - "AWS Bedrock Converse API" and "Bedrock supported models" — the current model catalog and request shape.
-- "emerging architectures for LLM applications" / "LLM app stack" — several good industry write-ups map this territory; read a couple and note where they agree.
+- "emerging architectures for LLM applications" / "LLM app stack" — several good industry write-ups map this territory; read a couple and note where they agree (the overlap is the signal; the specific tool/model names age in months and are the noise). Three worth reading, in order:
+  - [a16z — *Emerging Architectures for LLM Applications*](https://a16z.com/emerging-architectures-for-llm-applications/) — the canonical article this phrase comes from. RAG-centric and pre-agent (mid-2023), so light on the tools/agents layer, but it set the shared vocabulary. Its [living companion repo](https://github.com/a16z-infra/llm-app-stack) is the fresher, more useful part today — a categorized vendor menu.
+  - [MLflow — *LLM Application Architecture: A 2026 Engineer's Guide*](https://mlflow.org/articles/llm-application-architecture-a-2026-engineers-guide/) — the current-year counterweight, organized around the four layers that actually cause pain (orchestration, model, data, observability) and heavier on the eval/observability layer a16z under-weights.
+  - [DEV — *The AI Stack for 2026*](https://dev.to/dhruvjoshi9/the-ai-stack-for-2026-llms-vector-databases-tool-calling-agents-and-observability-2c7a) — the most practical; states the "add a layer only when the need appears" heuristic almost verbatim (internal data → RAG; actions → tool calling; multi-step → agents; users depend on it → observability).
 - "MLOps vs LLMOps" — how the ops discipline differs when the model is pre-trained and called, not trained by you.
 - "architecture decision records" (Michael Nygard's original template) — if ADRs are new to you, though as a staff engineer they likely aren't.
 - "when not to use an LLM" — worth actively seeking the skeptical take to calibrate your build-vs-buy instinct.
