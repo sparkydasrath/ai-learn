@@ -334,6 +334,14 @@ Expected shape of the output: something like `v1=72.00%  v2=88.00%  -> winner: v
 - **Chain-of-thought isn't free** and isn't always needed. Use it for genuine multi-step reasoning; skip it for extraction/classification.
 - **Keep the losers in git.** You'll revisit why v2 beat v1, and occasionally revert. Deleted prompt history is deleted evidence.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Start:** weekly [A-vs-B comparisons](R-reviewing-ai-written-code.md#review-templates). This module's two prompt versions are a natural first pair: name the deciding axis, not just the winner.
+- **Start reading:** the [reward-hacking material](R-reviewing-ai-written-code.md#gameable-tests-and-reward-hacking-at-engineer-depth). Tuning a prompt against a small labelled set is Goodhart's law in miniature; notice when you're teaching to your own test.
+- **Watch for:** agents "improving" a prompt by editing the labelled test set or its expected outputs (`test-tampering`).
+
 ## Checkpoint
 
 You're ready for module 06 if you can:

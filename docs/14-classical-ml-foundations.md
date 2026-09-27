@@ -414,6 +414,14 @@ The senior decision: don't reach for SageMaker because it's the "ML service." Re
 - **Simpler and explainable often wins the argument.** A regulator, a customer-success team, or an incident review will thank you for a model whose decisions you can explain. "The LLM said so" is a bad answer in a compliance meeting.
 - **Reproducibility: set `random_state`.** Splits, model initialization, and CV all have randomness. Pin the seed so runs are comparable and bugs are reproducible.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Cross-check:** verify the track's `agreement.py` against `sklearn.metrics.cohen_kappa_score` on your label files.
+- **Reframe:** your review labels are a classification problem. Build a confusion matrix of you vs the LLM judge and see which label pairs they confuse; those are your rubric's ambiguous lines.
+- **Watch for:** data leakage in agent-written pipelines (fitting the scaler before the split). It's the classical-ML cousin of reward hacking: a great score that measures nothing.
+
 ## Checkpoint
 
 You're ready for module 15 when you can, without looking things up:

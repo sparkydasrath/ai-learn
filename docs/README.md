@@ -55,6 +55,11 @@ Work through these in order. Each builds on the last, and each ends with a proje
 | 16 | [Fine-tuning & adaptation](16-fine-tuning-and-adaptation.md) | Decide when to fine-tune and do a LoRA fine-tune end to end. |
 | 17 | [Capstone & portfolio](17-capstone-and-portfolio.md) | Ship one substantial, evaluated, deployed system that proves the whole stack. |
 
+### Parallel track — run alongside every phase
+| # | Track | You'll be able to… |
+|---|-------|--------------------|
+| R | [Reviewing AI-written code](R-reviewing-ai-written-code.md) | Judge agent transcripts and diffs, spot gameable tests and reward hacking, write defensible reviews, calibrate rubrics, and track how model releases differ. Start it after 02; it converges with 09. |
+
 ## How the projects stack up
 
 Each module's project is small on its own, but they compound. By Phase 3 you're assembling earlier pieces; the capstone (17) pulls the whole thing together into one deployed, evaluated system you can show people.

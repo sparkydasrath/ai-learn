@@ -14,7 +14,7 @@ This is a **learning repository** for a senior/staff-level .NET engineer becomin
 
 ### The curriculum
 
-The learning path lives in [`docs/`](docs/README.md) — a build-first curriculum of 18 modules (00–17) taking the learner from Python foundations to a deployed, evaluated capstone. Start at [`docs/README.md`](docs/README.md). Each module ends with a hands-on project that belongs in `projects/<NN>-<name>/`. When helping with a module or its project, read that module's doc first so your guidance matches the curriculum's approach and vocabulary.
+The learning path lives in [`docs/`](docs/README.md) — a build-first curriculum of 18 modules (00–17) taking the learner from Python foundations to a deployed, evaluated capstone, plus a parallel track **R — Reviewing AI-written code** ([`docs/R-reviewing-ai-written-code.md`](docs/R-reviewing-ai-written-code.md)) that runs alongside the modules; its long-lived project is `projects/review-lab/`. Start at [`docs/README.md`](docs/README.md). Each module ends with a hands-on project that belongs in `projects/<NN>-<name>/`. When helping with a module or its project, read that module's doc first so your guidance matches the curriculum's approach and vocabulary.
 
 ### Learning approach (important)
 

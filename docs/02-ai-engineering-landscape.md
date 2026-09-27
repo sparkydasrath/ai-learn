@@ -306,6 +306,13 @@ You don't deploy anything to AWS in this module — the script runs locally agai
 - **Pin what you can; expect drift anyway.** Hosted models can change behavior under a stable-looking name. Your eval set is your defense: it turns "the model got worse" from a support ticket into a failing test.
 - **Match the role to the work.** If a task is really "train and serve a model at scale," that's ML-engineering work with different practices. Knowing you've wandered off the AI-engineer map saves you from applying the wrong playbook.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). **Start it when you finish this module.**
+
+- **Before moving on:** read the track's [Concepts](R-reviewing-ai-written-code.md#concepts) section, scaffold `projects/review-lab/`, and create an empty `journal/failures.jsonl`.
+- **Why now:** from module 03 on, you'll be using coding agents on every project. Start logging from the first session, not after you've forgotten the interesting failures.
+
 ## Checkpoint
 
 You're ready for module 03 when you can:

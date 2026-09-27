@@ -222,6 +222,14 @@ The field moves fast, and that's exactly why *judgment* — not memorized API sh
 - **Teach it.** Explaining RAG or evals to a colleague exposes every soft spot in your understanding faster than anything else.
 - **Keep one real system live.** Maintaining something deployed — watching its costs, its traces, its eval drift — teaches you things no tutorial can.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Close it out alongside the capstone.
+
+- **In the capstone:** include a written review of the agent-written parts of the system, using the [templates](R-reviewing-ai-written-code.md#review-templates): what was claimed, what changed, what you caught.
+- **Final calibration round:** re-run `agreement.py` on a fresh batch and compare with your first round from module 09.
+- **Portfolio:** put `review-lab` next to the capstone, with a README summarising your journal's tag distribution, calibration results and model notes. Then work through the track's [Checkpoint](R-reviewing-ai-written-code.md#checkpoint).
+
 ## Checkpoint
 
 You've truly finished when you can:

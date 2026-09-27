@@ -376,6 +376,14 @@ This tool runs fully locally. The one line that would change in production is th
 - **Hallucination is permanent; plan for it.** Ground, constrain, verify, and design the UX around unverified claims. Never let raw output drive an irreversible action.
 - **Pin model versions where you can; let evals catch drift.** A hosted model can change under a stable name. Your eval set is the regression suite that turns silent quality loss into a failing check.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **During the build:** after each agent session on `03-token-lab`, add a [journal](R-reviewing-ai-written-code.md#the-journal) entry for anything that failed.
+- **Watch for:** `hallucinated-api` (tokenizer libraries and encoding names get invented or mixed across versions) and confident but wrong facts about context sizes or prices. Check them against the provider's docs.
+- **Start:** the [gameable-tests lab](R-reviewing-ai-written-code.md#the-gameable-tests-lab). Front-load it over about two weeks, running into module 04.
+
 ## Checkpoint
 
 You're ready for module 04 when you can:

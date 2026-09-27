@@ -449,6 +449,13 @@ The senior call: prefer the **most managed option that meets the need**. Bedrock
 - **Small base first.** Prove the pipeline and the eval on a tiny model that trains in minutes before scaling up. Fast iteration loops beat big ambitious runs you can't debug.
 - **Version adapters and datasets together.** The adapter is only meaningful with its base and its data. Track all three; treat the adapter like a build artifact tied to a specific dataset version.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Reward hacking, caused by you:** check whether your fine-tune games its own metric. JSON-valid rate is easy to max out with valid but empty or default-filled JSON. Sample outputs by hand and add a content-correctness check next to the schema check.
+- **Held-out:** confirm the evaluation set was never in the training data. That's the same held-out discipline as the track's gameable-tests lab.
+
 ## Checkpoint
 
 You're ready for module 17 when you can, without looking things up:

@@ -380,6 +380,14 @@ The AWS specifics (CodeBuild buildspec, S3 layout) change — check current docs
 - **Reward abstention.** Include out-of-scope cases where "I don't know" is the correct answer, so you don't optimize your system into a confident liar.
 - **The eval is a release gate, not a report.** If it doesn't block a bad merge, it's decoration.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). **Convergence point:** the track's hand-labelled reviews meet this module's harness.
+
+- **During the build:** write the track's [rubric](R-reviewing-ai-written-code.md#rubric-and-agreement) and run the first full calibration round (label 30, re-label blind a week later, run `agreement.py`).
+- **Wire them together:** feed your labelled reviews to `09-eval-harness` as an eval set, with an LLM judge using the rubric as its prompt. Your labels are the human ground truth this module tells you to validate the judge against; measure the judge's kappa against you.
+- **Red-team the spec:** before trusting the eval gate, ask how a change could pass it without improving quality.
+
 ## Checkpoint
 
 This is the module to be hard on yourself about. You're ready for Phase 4 if you can:

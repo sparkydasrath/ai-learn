@@ -337,6 +337,13 @@ This *is* the AWS module — the section above is the move. The higher-order poi
 - **Pitfall: gating deploys on tests but not evals.** Quality is a release gate ([09](09-evaluation-and-testing.md)); a green unit-test suite can ship a model regression. Run evals in CI.
 - **Pitfall: Lambda for long streaming generations.** Duration/timeout ceilings and cold starts bite; use Fargate for always-on streaming APIs.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Move to the cloud:** run your personal benchmark in CodeBuild against Bedrock-hosted models, archiving outputs to S3 (see the track's *Moving to AWS*).
+- **Watch for:** in agent-written IaC, over-broad IAM (`"Action": "*"`, `"Resource": "*"`), public exposure and unrequested resources (`scope-creep`). Review the IaC diff with the same care as application code, since cost and blast radius are bigger here.
+
 ## Checkpoint
 
 You're ready for [13](13-cost-scaling-and-security.md) if you can:

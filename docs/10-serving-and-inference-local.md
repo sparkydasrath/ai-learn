@@ -421,6 +421,12 @@ The payoff of the gateway pattern: because your app talks to a clean `/chat` end
 - **Pitfall: benchmarking on CPU and extrapolating.** Numbers from CPU Ollama on a laptop tell you *relative* quant behavior, not production throughput. Don't quote them in a capacity plan.
 - **Pitfall: forgetting the KV cache in memory math.** Long contexts (hello, RAG) can consume as much VRAM as the weights. Budget for it.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Extend the benchmark:** add your local open model (at both quantization levels) to your [personal benchmark](R-reviewing-ai-written-code.md#tracking-model-releases). Write a model note on how small or quantized models fail differently from frontier ones (typically more `hallucinated-api` and `misread-spec`).
+
 ## Checkpoint
 
 You're ready for [11](11-observability-and-guardrails.md) if you can:

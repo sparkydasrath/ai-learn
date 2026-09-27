@@ -407,6 +407,13 @@ The senior habit: **treat GPUs like any expensive, metered resource** — provis
 - **Don't train from scratch to feel legitimate.** Reaching for a pretrained model isn't cutting corners; it's the professional default. Training from scratch is the exception you justify, not the norm you prove yourself with.
 - **Set seeds, but expect wobble.** `torch.manual_seed(...)` helps reproducibility, but GPU nondeterminism and library versions mean exact numbers vary. Assert quality floors in tests, not exact values (same lesson as module 14).
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Revisit:** re-read the [reward-hacking section](R-reviewing-ai-written-code.md#gameable-tests-and-reward-hacking-at-engineer-depth). You've now seen the loop: a model changes whatever lowers the loss, whether or not that's what you meant. RL swaps the loss for a reward, and the same pressure applies.
+- **Before moving on:** write your one-page reward-hacking explainer in your own words, backed by examples from your journal.
+
 ## Checkpoint
 
 You're ready for module 16 when you can, without looking things up:

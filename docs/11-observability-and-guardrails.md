@@ -397,6 +397,13 @@ The gateway/observability seam you built locally means adopting these is mostly 
 - **Pitfall: adopting a heavyweight tracing vendor before you have structured logs.** Get one clean JSON record per call first; it's portable to any tool. The tool is the easy part.
 - **Feedback is free eval data — capture it.** 👎 responses are the exact hard cases your eval set lacks. Build the loop from production to eval set on day one.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Taxonomy:** add `prompt-injection` and `unsafe-tool-use` tags to your [taxonomy](R-reviewing-ai-written-code.md#the-failure-mode-taxonomy). Structured traces make agent transcripts reviewable at scale; sample a few each week.
+- **Watch for:** guardrail code that fails *open*, meaning a check that throws, gets caught and lets the request through (`swallowed-error`). Every guardrail needs a test proving it blocks.
+
 ## Checkpoint
 
 You're ready for [12](12-deploying-to-aws.md) if you can:

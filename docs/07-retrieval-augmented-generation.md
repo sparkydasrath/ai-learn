@@ -490,6 +490,13 @@ Don't reach for the managed option until the do-it-yourself version has taught y
 - **Watch the embedding-model trap.** Embedding queries and documents with different models, or silently changing the embedding model without re-indexing, produces confidently wrong results with no error.
 - **Cost and latency are real.** Reranking 50 candidates and sending 8 chunks per query adds up. Measure tokens and milliseconds from day one (03/04 habits carry forward).
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Watch for:** tests with hard-coded retrieval results (`special-casing`), and a `recall@k` eval that's gameable because its questions were written by copying phrases out of the chunks.
+- **Comparison of the week:** have two agents (or one agent twice) implement the chunker, then write an [A-vs-B comparison](R-reviewing-ai-written-code.md#review-templates) with concrete inputs that separate them (headings, code blocks, very long paragraphs).
+
 ## Checkpoint
 
 You're ready for 08 if you can, without looking back:

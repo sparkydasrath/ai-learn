@@ -476,6 +476,13 @@ This project is **local-only** — a warm-up, nothing to deploy. But the Dockerf
 - **Prefer the standard library.** `collections`, `itertools`, `functools`, `pathlib`, `dataclasses` cover an enormous amount. Reaching straight for a dependency is often a tell that you don't know the stdlib yet.
 - **Don't over-async.** I/O concurrency, yes. But async everywhere for its own sake makes Python code harder to read and test, and buys nothing for CPU work. Add it where you fan out network calls, not reflexively.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). It starts properly after module 02; this is groundwork.
+
+- **Carry forward:** the pytest habits from this module are the foundation for the track's [gameable-tests lab](R-reviewing-ai-written-code.md#the-gameable-tests-lab). You'll add `hypothesis` and `mutmut` on top.
+- **Optional retro:** if an agent wrote part of `01-python-warmup`, review one of its diffs with the [single-change template](R-reviewing-ai-written-code.md#review-templates).
+
 ## Checkpoint
 
 You're ready for module 02 when you can, without looking things up:

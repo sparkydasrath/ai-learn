@@ -401,6 +401,14 @@ What you gain: you don't operate the loop, and it integrates with IAM for the au
 - **Don't reach for a framework to feel legitimate.** Understand the loop first; adopt a framework when it solves a felt problem, not preemptively.
 - **You still can't tell if it's *good*.** The loop terminating isn't quality. That's 09.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). **Major touchpoint:** this is where the track and the modules meet.
+
+- **During the build:** use the per-step structured log as a transcript. Run your agent on 10–20 questions and review *its* transcripts with the [failure-mode taxonomy](R-reviewing-ai-written-code.md#the-failure-mode-taxonomy): claimed vs actual, `false-verification`, `misread-spec`.
+- **Then:** re-read a few of your coding-agent transcripts. Now that you've built the reason → act → observe loop yourself, note which failures come from the loop (bad tool choice, early stop) and which come from the model.
+- **Watch for:** anything that lets an action reach a side-effecting tool without passing the approval gate.
+
 ## Checkpoint
 
 You're ready for 09 if you can:

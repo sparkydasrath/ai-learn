@@ -24,6 +24,7 @@ Reading these will make you *conversant*. Building the projects — and getting 
 - **Break things on purpose.** Feed a RAG system a question it can't answer. Give an agent a tool that fails. Watch what happens. AI systems fail in ways deterministic code doesn't, and you need reps.
 - **Measure before you optimize.** From module 09 onward, "is it better?" should always be answerable with a number. Resist the urge to tune prompts by feel.
 - **Keep a lab notebook.** A `NOTES.md` per project: what you tried, what the eval said, what surprised you. This is your real learning artifact.
+- **Run the review track alongside.** [R — Reviewing AI-written code](R-reviewing-ai-written-code.md) is a parallel track, not a numbered module. Every module doc has a **Review track sync** section just before its Checkpoint, telling you what to review, what to watch for and what to finish before moving on.
 - **Don't skip Phase 3's evaluation module (09).** It's the single biggest difference between an AI engineer and a vibe coder. If you only deeply learn one thing here, learn to evaluate.
 
 ## Tooling you'll set up in module 01

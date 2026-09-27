@@ -328,6 +328,13 @@ The discipline (straight from [00](00-how-to-use-these-docs.md) and [09](09-eval
 - **Pitfall: caching or retrieving without `tenant_id` partitioning.** Cross-tenant leakage is a breach, and semantic caches make it silent. Partition everything by tenant.
 - **Pitfall: unbounded retries and no timeout.** A retry storm is a cost *and* reliability event. Backoff, jitter, circuit-break, and always time out.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Red-team the spec:** "cost down, quality holds on the 09 eval set" is gameable. A cache warmed with the eval questions, or a router that recognises them, passes the gate without earning it. Hold out eval items the cache and router never see.
+- **Watch for:** agent-written prompt-injection tests that only cover the attacks the defence was written for (`special-casing`), rather than variants.
+
 ## Checkpoint
 
 You're ready for [14](14-classical-ml-foundations.md) if you can:

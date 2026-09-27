@@ -464,6 +464,14 @@ Flip `LLM_BACKEND=hosted` in `.env` and the *same* `demo.py` runs against the ho
 - **Don't leak the vendor SDK past your interface.** The one place you import the vendor package should be inside your implementation class. Everything else sees `LlmClient`.
 - **Local ≠ hosted quality.** Ollama is perfect for wiring, tests, and offline iteration; a small local model may answer worse than a frontier hosted one. Develop local, evaluate (module 09) before trusting either in prod.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **During the build:** write one full [single-change review](R-reviewing-ai-written-code.md#review-templates) of the agent's retry/backoff implementation.
+- **Watch for:** `swallowed-error` (a broad `except` returning `None` after the last retry), `silent-regression` (retrying non-idempotent calls, changed timeout defaults) and `mock-the-subject` (tests that only exercise the fake client, never the retry logic itself).
+- **Before moving on:** finish the gameable-tests lab (8–10 tasks, with mutation testing run in Docker).
+
 ## Checkpoint
 
 You're ready for module 05 if you can:

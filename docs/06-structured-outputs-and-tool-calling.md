@@ -384,6 +384,13 @@ docker compose run --rm app python run.py      # extract the sample invoice, the
 - **Structured mode is not validation.** "JSON mode" guarantees parseable JSON, not *your* schema. Always validate the fields.
 - **Injection reaches tools.** Untrusted text in the context can steer tool calls. Your validate-and-authorize layer is the defense, not the model's good judgment.
 
+## Review track sync
+
+> Parallel track: [R — Reviewing AI-written code](R-reviewing-ai-written-code.md). Keep it in step with this module.
+
+- **Watch for:** validation loosened until it passes (fields made `Optional`, `extra="allow"`, catch-all defaults). That's `test-tampering` aimed at the schema instead of the test. Also watch for repair-retry loops that hide real failures (`swallowed-error`), and tool tests that mock the model *and* the tool (`mock-the-subject`).
+- **Before moving on:** draft your [personal benchmark](R-reviewing-ai-written-code.md#tracking-model-releases), about five fixed tasks taken from projects 03–06.
+
 ## Checkpoint
 
 You're ready for module 07 if you can:
