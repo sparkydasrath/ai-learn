@@ -22,6 +22,7 @@ The script also writes these in each newly created project:
 
 - .vscode/settings.json
 - .vscode/tasks.json
+- pyrightconfig.json
 - tests/test_smoke.py (unless pytest is skipped)
 
 It also sets:
@@ -35,12 +36,13 @@ Given a project name like 04-my-new-project, the script will:
 
 1. Run uv init with your selected mode and Python version.
 2. Ensure src and tests folders exist.
-3. Optionally add pytest and create a smoke test.
-4. Create .vscode/settings.json with per-project interpreter and src path.
-5. Create .vscode/tasks.json so any project can bootstrap the next one.
-6. Optionally create .venv and run uv sync.
-7. Optionally append the project folder to ai-learn.code-workspace.
-8. Set AI_LEARN_PROJECT to the project name for this run and persist it for future shells.
+3. Write pyrightconfig.json so Pylance resolves imports from src in tests.
+4. Optionally add pytest and create a smoke test.
+5. Create .vscode/settings.json with per-project interpreter and src path.
+6. Create .vscode/tasks.json so any project can bootstrap the next one.
+7. Optionally create .venv and run uv sync.
+8. Optionally append the project folder to ai-learn.code-workspace.
+9. Set AI_LEARN_PROJECT to the project name for this run and persist it for future shells.
 
 ## Naming convention
 

@@ -8,7 +8,7 @@ $env:AI_LEARN_PROJECT = "02-landscape-map"
 code .
 
 # For project 03
-$env:AI_LEARN_PROJECT = "03-llm-fundamentals"
+$env:AI_LEARN_PROJECT = "03-token-lab"
 code .
 ```
 

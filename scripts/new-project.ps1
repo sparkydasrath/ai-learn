@@ -49,6 +49,25 @@ if ($Mode -eq "package") {
 New-Item -ItemType Directory -Path (Join-Path $projectDir "src") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $projectDir "tests") -Force | Out-Null
 
+# 2a) Create a Pyright config so src imports resolve reliably in tests.
+$pyrightConfig = @'
+{
+  "include": [
+    "src",
+    "tests"
+  ],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": [
+        "src"
+      ]
+    }
+  ]
+}
+'@
+Set-Content -Path (Join-Path $projectDir "pyrightconfig.json") -Value $pyrightConfig -Encoding UTF8
+
 # 3) Optional test setup.
 if (-not $SkipPytest) {
   Push-Location $projectDir
