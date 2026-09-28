@@ -70,3 +70,7 @@ Each module's project is small on its own, but they compound. By Phase 3 you're 
 - Every project runs **locally in Docker first**, then has notes on **moving it to AWS**.
 - Secrets go in `.env` (git-ignored); commit a `.env.example`.
 - Python is the default language for AI code; see module 01 for the toolchain.
+
+## Tooling automation
+
+- [Project bootstrap automation](project-bootstrap-automation.md) shows how to scaffold a new project with `uv`, per-project VS Code settings, local tasks, and optional workspace registration.
