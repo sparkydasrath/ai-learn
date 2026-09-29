@@ -109,63 +109,7 @@ $settings = @'
 '@
 Set-Content -Path (Join-Path $vscodeDir "settings.json") -Value $settings -Encoding UTF8
 
-# 5) Create a local task so any project can scaffold another project.
-$tasks = @'
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "AI Learn: Bootstrap New Project",
-      "type": "shell",
-      "command": "pwsh",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/../../scripts/new-project.ps1",
-        "-ProjectName",
-        "${input:projectName}",
-        "-Mode",
-        "${input:projectMode}",
-        "-PythonVersion",
-        "${input:pythonVersion}"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/../.."
-      },
-      "problemMatcher": []
-    }
-  ],
-  "inputs": [
-    {
-      "id": "projectName",
-      "type": "promptString",
-      "description": "Project folder name (example: 04-my-new-project)",
-      "default": "04-my-new-project"
-    },
-    {
-      "id": "projectMode",
-      "type": "pickString",
-      "description": "uv init mode",
-      "options": [
-        "package",
-        "app"
-      ],
-      "default": "package"
-    },
-    {
-      "id": "pythonVersion",
-      "type": "promptString",
-      "description": "Python version passed to uv init --python",
-      "default": "3.11"
-    }
-  ]
-}
-'@
-Set-Content -Path (Join-Path $vscodeDir "tasks.json") -Value $tasks -Encoding UTF8
-
-# 6) Optional venv creation and dependency sync.
+# 5) Optional venv creation and dependency sync.
 if ($CreateVenv) {
   Push-Location $projectDir
   try {
@@ -179,7 +123,7 @@ if ($CreateVenv) {
   }
 }
 
-# 7) Optionally add this folder to the workspace file.
+# 6) Optionally add this folder to the workspace file.
 if ($AddToWorkspace -and (Test-Path $workspaceFile)) {
   $workspaceJson = Get-Content $workspaceFile -Raw | ConvertFrom-Json
   $relativePath = "projects/$ProjectName"
@@ -198,7 +142,7 @@ if ($AddToWorkspace -and (Test-Path $workspaceFile)) {
   }
 }
 
-# 8) Set AI_LEARN_PROJECT to the new project name.
+# 7) Set AI_LEARN_PROJECT to the new project name.
 $env:AI_LEARN_PROJECT = $ProjectName
 [Environment]::SetEnvironmentVariable("AI_LEARN_PROJECT", $ProjectName, "User")
 

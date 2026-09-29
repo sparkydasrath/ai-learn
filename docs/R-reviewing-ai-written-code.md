@@ -46,6 +46,7 @@ Most agent failures fall into a small set of recurring shapes. Tag every failure
 | `scope-creep` | Unrequested refactors, renames or "improvements" that bloat the diff and hide the real change. |
 | `over-engineering` | Abstractions, config or layers the task didn't need. |
 | `misread-spec` | Solves a different, usually easier, problem than the one asked. |
+| `env-mismatch` | Assumes an environment, project setup or toolchain behavior that isn't the one you have. For example, a Dockerfile that expects the project to be installed as a package when it isn't. The code is fine in the environment the model imagined and breaks in yours. |
 
 Add tags when you meet something new. The list is yours to grow.
 

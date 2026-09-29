@@ -16,12 +16,11 @@ Creating that by hand is repetitive and error-prone. The bootstrap script standa
 ## Files added for automation
 
 - scripts/new-project.ps1
-- projects/<existing-project>/.vscode/tasks.json (task runner entrypoint)
+- .vscode/tasks.json (task entrypoint that VS Code loads from the root folder)
 
 The script also writes these in each newly created project:
 
 - .vscode/settings.json
-- .vscode/tasks.json
 - pyrightconfig.json
 - tests/test_smoke.py (unless pytest is skipped)
 
@@ -39,10 +38,9 @@ Given a project name like 04-my-new-project, the script will:
 3. Write pyrightconfig.json so Pylance resolves imports from src in tests.
 4. Optionally add pytest and create a smoke test.
 5. Create .vscode/settings.json with per-project interpreter and src path.
-6. Create .vscode/tasks.json so any project can bootstrap the next one.
-7. Optionally create .venv and run uv sync.
-8. Optionally append the project folder to ai-learn.code-workspace.
-9. Set AI_LEARN_PROJECT to the project name for this run and persist it for future shells.
+6. Optionally create .venv and run uv sync.
+7. Optionally append the project folder to ai-learn.code-workspace.
+8. Set AI_LEARN_PROJECT to the project name for this run and persist it for future shells.
 
 ## Naming convention
 
@@ -98,7 +96,7 @@ Do not update workspace file:
 
 ## Usage from VS Code task
 
-From any project folder already in the workspace:
+From the repository root or the ai-learn.code-workspace:
 
 1. Open Command Palette.
 2. Run Tasks: Run Task.
@@ -129,8 +127,16 @@ Project already exists:
 
 Task cannot find script:
 
-- Run the task from a project folder that lives under projects.
+- Make sure you opened ai-learn.code-workspace (not a single subfolder).
 - Confirm scripts/new-project.ps1 exists.
+
+Task does not appear in Tasks: Run Task:
+
+- In VS Code, tasks are scoped to the current workspace context.
+- This repository defines AI Learn: Bootstrap New Project in .vscode/tasks.json at the repository root.
+- If you opened only a project subfolder (for example projects/01-python-warmup) instead of the repository root or workspace file, that task will not be available.
+- Fix: open the repository root or ai-learn.code-workspace, then run Tasks: Run Task again.
+- If it still does not appear, run Developer: Reload Window and retry.
 
 New project not appearing in Explorer:
 
