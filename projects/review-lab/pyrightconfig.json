@@ -1,0 +1,13 @@
+{
+  "include": [
+    "gameable_tests"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "gameable_tests",
+      "extraPaths": [
+        "gameable_tests/src"
+      ]
+    }
+  ]
+}
