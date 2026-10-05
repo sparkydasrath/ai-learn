@@ -66,11 +66,15 @@ Each module's project is small on its own, but they compound. By Phase 3 you're 
 
 ## Conventions
 
-- Projects live in `projects/<NN>-<name>/` at the repo root (each self-contained: its own `pyproject.toml`, `Dockerfile`, tests, README).
+- Projects live in `projects/<NN>-<name>/` at the repo root.
+- **Polyglot from module 03:** each project has a `python/` folder (built first; it's the spec) and a `csharp/` folder (a second implementation in idiomatic .NET). Each folder is self-contained, with its own Dockerfile, tests (pytest / NUnit) and README, and both expose the same behavior. Modules 01–02 are Python-only. See [00 — Two languages](00-how-to-use-these-docs.md#two-languages-python-first-then-c) for why.
+- **[Conventions](conventions.md)** holds the rules every module follows: model backends and env vars, ports, compose, Docker, shell commands, and what a module doc must show. The decisions behind them are in [decision records](adr/).
 - Every project runs **locally in Docker first**, then has notes on **moving it to AWS**.
 - Secrets go in `.env` (git-ignored); commit a `.env.example`.
 - Python is the default language for AI code; see module 01 for the toolchain.
 
 ## Tooling automation
 
-- [Project bootstrap automation](project-bootstrap-automation.md) shows how to scaffold a new project with `uv`, per-project VS Code settings, local tasks, and optional workspace registration.
+- [Environment settings](env-settings.md) covers the per-machine setup: the AWS CLI profile used from module 12, and switching the active project.
+- `tools/doccheck` lints these docs against the conventions: `uv run --project tools/doccheck doccheck`. The [readiness checklist](readiness-checklist.md) tracks the open findings from the last full review.
+- [Project bootstrap automation](project-bootstrap-automation.md) shows how to scaffold a new project, with `uv` for the Python side (`scripts/new-python-project.ps1`) and `dotnet` for the C# side (`scripts/new-csharp-project.ps1`). It also covers per-project VS Code settings, local tasks, and optional workspace registration.

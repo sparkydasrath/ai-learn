@@ -1,0 +1,33 @@
+[project]
+name = "token-lab"
+version = "0.1.0"
+description = "Module 03: count tokens, estimate cost, compare embeddings."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.4.6",
+    "sentence-transformers>=6.1.0",
+    "tiktoken>=0.14.0",
+    # Direct so [tool.uv.sources] applies: uv ignores sources for transitive dependencies.
+    "torch>=2.14.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+# sentence-transformers pulls in torch. From PyPI that's the CUDA build on Linux (several GB in
+# the image); this module only needs CPU inference. See docs/conventions.md#pytorch-wheels.
+# On Windows, PyPI torch is CPU-only already; this index keeps Linux/Docker the same.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]

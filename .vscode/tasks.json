@@ -1,0 +1,90 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "AI Learn: Bootstrap New Python Project",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/scripts/new-python-project.ps1",
+				"-ProjectName",
+				"${input:projectName}",
+				"-Mode",
+				"${input:projectMode}",
+				"-PythonVersion",
+				"${input:pythonVersion}"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "AI Learn: Bootstrap New C# Project",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/scripts/new-csharp-project.ps1",
+				"-ProjectName",
+				"${input:projectName}",
+				"-Template",
+				"${input:dotnetTemplate}",
+				"-Framework",
+				"${input:dotnetFramework}"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		}
+	],
+	"inputs": [
+		{
+			"id": "projectName",
+			"type": "promptString",
+			"description": "Project folder name (example: 04-my-new-project)",
+			"default": "04-my-new-project"
+		},
+		{
+			"id": "projectMode",
+			"type": "pickString",
+			"description": "uv init mode",
+			"options": [
+				"package",
+				"app"
+			],
+			"default": "package"
+		},
+		{
+			"id": "pythonVersion",
+			"type": "promptString",
+			"description": "Python version passed to uv init --python",
+			"default": "3.12"
+		},
+		{
+			"id": "dotnetTemplate",
+			"type": "pickString",
+			"description": "dotnet new template for the main project",
+			"options": [
+				"console",
+				"classlib",
+				"webapi"
+			],
+			"default": "console"
+		},
+		{
+			"id": "dotnetFramework",
+			"type": "promptString",
+			"description": "Target framework",
+			"default": "net10.0"
+		}
+	]
+}

@@ -10,7 +10,7 @@ This is a **parallel track**, not a module you finish. Start it now and run it a
 
 - **Prerequisites:** module 01 (Python, pytest, uv) and some agent sessions to review. You have both.
 - **Runs alongside:** every numbered module. Each module's build project is a source of agent transcripts and diffs to judge.
-- **Converges with 09:** your hand-labelled reviews become an eval set, and "LLM-as-judge vs your labels" becomes a calibration exercise.
+- **Converges with 09:** your hand-labelled reviews become an eval set ([how](#from-reviews-to-a-module-09-eval-set)), and "LLM-as-judge vs your labels" becomes a calibration exercise.
 - **Pays off in 15–16:** once you've seen a training loop and a fine-tune, reward hacking stops being abstract. You'll know where the reward comes from.
 
 When you're through this track you'll be able to:
@@ -98,6 +98,8 @@ New models ship every few months, and "which is better?" depends on the task. Ke
 
 **`projects/review-lab/`** is a long-lived lab that grows across the whole curriculum. It holds a failure-mode journal, a gameable-tests lab, written reviews and comparisons, a rubric with measured agreement, and model-release notes. Unlike the numbered projects, it has no single "done" date. It's your running evidence base.
 
+The folder already exists in the repo, and it's **behind this doc on purpose**: it holds what you've built so far (the journal and the start of the gameable-tests lab), not the finished lab. So expect gaps against the layout below: Python 3.11 rather than 3.12, no `hypothesis` or `mutmut` yet, no `test_median_strong.py`, Dockerfile, `rubric/`, `reviews/`, `comparisons/` or `model_notes/`, and a leftover `main.py` from `uv init`. Each one arrives at the stage in the [schedule](#schedule-alongside-the-curriculum) that needs it. When you catch up the Python version, set `requires-python = ">=3.12"` and run `uv python pin 3.12`, then delete `main.py`.
+
 ### Layout
 
 ```
@@ -105,7 +107,8 @@ projects/review-lab/
 ├── journal/
 │   └── failures.jsonl        # one line per caught failure, tagged with the taxonomy
 ├── reviews/
-│   └── 2026-10-02-04-retry-client.md   # single-change judgments (template below)
+│   ├── 2026-10-02-04-retry-client.md   # single-change judgments (template below)
+│   └── 2026-10-02-04-retry-client.diff # the diff it judged: the eval-set input
 ├── comparisons/
 │   └── 2026-10-09-lru-cache-a-vs-b.md  # A-vs-B write-ups (template below)
 ├── gameable_tests/
@@ -118,12 +121,16 @@ projects/review-lab/
 │   ├── labels/me_round1.jsonl
 │   ├── labels/me_round2.jsonl
 │   ├── labels/judge_modelA.jsonl
+│   ├── eval_set.jsonl        # reviews as module-09 eval rows (see below)
 │   └── agreement.py          # Cohen's kappa between any two label files
 ├── model_notes/
 │   ├── benchmark.md          # the fixed ~5 personal tasks
 │   └── 2026-10-model-x.md    # one note per release
 ├── pyproject.toml
+├── uv.lock
 ├── Dockerfile
+├── Dockerfile.dockerignore
+├── .gitignore                # mutants/: mutmut's scratch copy
 └── README.md
 ```
 
@@ -132,7 +139,7 @@ projects/review-lab/
 Use one JSON line per failure you catch. Keep it cheap to write. If logging takes more than two minutes, you'll stop doing it.
 
 ```jsonl
-{"id": "2026-10-01-01", "project": "04-model-client", "agent": "claude-code", "model": "<model id>", "task": "add retries with backoff", "claimed": "added retries; all tests pass", "actual": "retries POST (non-idempotent) and swallows final exception, returning None", "tags": ["swallowed-error", "silent-regression"], "caught_by": "diff review", "lesson": "check retry scope and what happens after the last attempt"}
+{"id": "2026-10-01-01", "project": "04-llm-client", "agent": "claude-code", "model": "<model id>", "task": "add retries with backoff", "claimed": "added retries; all tests pass", "actual": "retries POST (non-idempotent) and swallows final exception, returning None", "tags": ["swallowed-error", "silent-regression"], "caught_by": "diff review", "lesson": "check retry scope and what happens after the last attempt"}
 ```
 
 Read the journal once a month and count the tags. The distribution *is* your working opinion on how models fail, and it's backed by data rather than anecdotes.
@@ -141,6 +148,7 @@ Read the journal once a month and count the tags. The distribution *is* your wor
 
 Write small tasks with deliberately weak test suites, hand them to an agent with an instruction like "make the tests pass", and record what it does. Then write the strong suite and keep the task.
 
+<!-- doccheck: ignore=not-implemented -->
 ```python
 # gameable_tests/src/gamelab/median.py
 def median(xs: list[float]) -> float:
@@ -292,7 +300,7 @@ Where to get comparison material:
 - The same task solved by two different models, or by one model twice.
 - Your own implementation versus the agent's.
 - **Real merged open-source PRs.** Judge them before reading the maintainers' review, then compare your verdict with theirs. This is the closest thing to a free answer key.
-- **Read beyond Python.** Do a share of comparisons in TypeScript and at least one other language. Agents write in every language, and judging unfamiliar code quickly is the skill.
+- **Read beyond Python.** Every module from 03 on has a C# half, and you'll have an agent write some of it. Review that C# with the same templates, alternating with the Python reviews. The module docs' **C#-specific watch** bullets list what agents get wrong in .NET (stale API names from preview packages, invented library features, `System.Text.Json` defaults that quietly change behavior). Judging the language you know best is where your verdicts will be most precise, so it's also where you'll calibrate fastest.
 
 ### Rubric and agreement
 
@@ -337,6 +345,32 @@ if __name__ == "__main__":
 
 The disagreement list matters more than the kappa score. Every disagreement is either an ambiguous rubric line (fix the rubric) or a real miss by one rater (write down which). When you reach module 14, cross-check this against `sklearn.metrics.cohen_kappa_score`.
 
+### From reviews to a module-09 eval set
+
+At module 09 your labelled reviews become an eval set, and an LLM judge becomes the system under test. The mapping is mechanical:
+
+| Eval-set field | Comes from |
+|---|---|
+| `id` | the review's file name, e.g. `2026-10-02-04-retry-client`. The same id as in `rubric/labels/*.jsonl`. |
+| `input.claim` | the review's **What the agent claimed** line |
+| `input.diff` | the matching `reviews/<id>.diff`. Save it with `git diff > reviews/<id>.diff` when you write the review, because the arena or branch it came from won't last. |
+| `expected` | your label: `accept`, `accept-with-nits`, `reject-incorrect` or `reject-gamed` |
+
+One row per reviewed change, in `rubric/eval_set.jsonl`:
+
+```json
+{"id": "2026-10-02-04-retry-client", "input": {"claim": "added retries; all tests pass", "diff": "diff --git a/src/llm_client/retry.py ..."}, "expected": "reject-incorrect"}
+```
+
+The judge gets `rubric.md` as its instructions and `input` as the item, and must answer with exactly one label. Score it by **exact label match**: the share of rows where the judge's label equals `expected`. There's no partial credit, and an answer that isn't one of the four labels counts as wrong. Have the judge harness also write its answers as `{"id": ..., "label": ...}` lines to `rubric/labels/judge_<model>.jsonl`, so the same file feeds the agreement script:
+
+```powershell
+cd projects/review-lab
+uv run python rubric/agreement.py rubric/labels/me_round2.jsonl rubric/labels/judge_modelA.jsonl
+```
+
+Report both numbers. Exact-match accuracy is what module 09's harness prints, and kappa is the chance-corrected version of the same comparison. They diverge when one label dominates: if 80% of your reviews are `accept`, a judge that always says `accept` scores 0.80 accuracy and a kappa of 0. Your own round-1 vs round-2 kappa is the ceiling: a judge can't agree with you more reliably than you agree with yourself. Keep the eval set to items you labelled *before* writing the judge prompt, or you're tuning the judge on its own test set.
+
 ### Run it locally, then in Docker
 
 The lab isn't a distributable package, so skip packaging and put the source on pytest's path:
@@ -375,13 +409,32 @@ COPY . .
 CMD ["uv", "run", "pytest", "gameable_tests/tests/test_median_strong.py", "-q"]
 ```
 
-```bash
+`COPY . .` copies whatever is in the folder, so the ignore file next to the Dockerfile has to keep out anything host-specific ([conventions](conventions.md#docker)). Above all that's your Windows `.venv`, which would overwrite the Linux one `uv sync` just built. `mutants/` is mutmut's working copy of your code, regenerated on every run:
+
+```
+# Dockerfile.dockerignore
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.hypothesis/
+**/mutants/
+```
+
+Keep `mutants/` and the Hypothesis example database out of git too:
+
+```
+# .gitignore
+mutants/
+.hypothesis/
+```
+
+```powershell
+cd projects/review-lab
+uv lock                       # once, so there's a uv.lock to copy (as in module 01)
 docker build -t review-lab .
 docker run --rm review-lab
 docker run --rm review-lab uv run mutmut run
 ```
-
-Run `uv lock` once locally so there's a `uv.lock` to copy, the same way as in module 01.
 
 ### Moving to AWS
 
@@ -412,7 +465,7 @@ Stages, tied to where you are in the numbered modules. Each module doc has a mat
 | **06** | Watch for loosened validation and repair loops that hide failures. Draft your personal benchmark from 03–06 tasks. |
 | **07** | Watch for hard-coded retrieval and a gameable `recall@k`. Compare two agents' chunking implementations. |
 | **08** | You build an agent loop. Log its transcripts and review *your own agent* with the same taxonomy. Reading transcripts from the inside is where this track and the modules meet. |
-| **09** | Write the rubric and run the first full calibration. Feed your labelled reviews to 09's harness as an eval set, and use your labels to validate 09's LLM judge. |
+| **09** | Write the rubric and run the first full calibration. Feed your labelled reviews to 09's harness as an eval set ([mapping](#from-reviews-to-a-module-09-eval-set)), and use your labels to validate 09's LLM judge. |
 | **10** | Add a local open model to your personal benchmark and note how small or quantized models fail differently. |
 | **11** | Traces make transcripts reviewable. Add `prompt-injection` and `unsafe-tool-use` tags. Review guardrails for failing open. |
 | **12** | Move benchmark runs to CodeBuild + Bedrock. Review agent-written IaC for over-broad permissions. |
@@ -452,5 +505,9 @@ You're getting this if you can:
 - **Coding benchmarks and their weaknesses:** SWE-bench (Jimenez et al.) and the write-ups on its human-validated "Verified" subset, a case study in how weak task specs and tests distort results.
 - **Frontier model system cards:** the major labs publish these for each release, and recent ones discuss reward hacking in coding tasks. Read the relevant sections when a model ships. This doubles as release tracking.
 - **Tooling:** the Hypothesis docs (start with "strategies"), the mutmut docs, and module 09's LLM-as-judge section for the judge side of calibration.
+
+*Last verified: 2026-10-05. Built: the doc's `pyproject.toml`, `test_median_strong.py` and `rubric/agreement.py` in a throwaway folder (`uv lock`, pytest 3 passed against a reference `median`; `agreement.py` reproduces the always-`accept` judge example: kappa 0.00 at 0.80 accuracy). Read-only: the Docker image and `mutmut run` (Docker wasn't available), and the existing `projects/review-lab/`, which is behind this doc by design.*
+
+**Verify on first build:** the `[tool.mutmut]` key names for your mutmut version, and that mutmut writes its working copy to `mutants/`.
 
 Back to the [curriculum index](README.md).

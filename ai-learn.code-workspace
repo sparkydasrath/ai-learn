@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "docs"
+		},
+		{
+			"path": "projects/01-python-warmup"
+		},
+		{
+			"path": "projects/02-landscape-map"
+		},
+		{
+			"path": "projects/03-token-lab/python"
+		},
+		{
+			"path": "projects/review-lab"
+		}
+	],
+	"settings": {
+		"python.analysis.usePerProjectEnvironments": true,
+		"python.analysis.addFoldersForPythonProjects": true
+	}
+}

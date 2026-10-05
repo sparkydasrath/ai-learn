@@ -36,9 +36,8 @@ ScaffoldingReadMe.txt
 # NuGet Symbol Packages
 *.snupkg
 
-# dotenv environment variables file
+# dotenv environment variables file (.env.example IS committed — see Secrets below)
 .env
-.env.example
 
 # Others
 ~$*
@@ -58,18 +57,35 @@ docs/job
 TestResult.xml
 nunit-*.xml
 
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.rsuser
+*.userprefs
+
+# Code coverage / benchmarks
+*.coverage
+*.coveragexml
+*.cobertura.xml
+BenchmarkDotNet.Artifacts/
+
 # JetBrains Rider / IntelliJ (.idea)
 .idea/
 *.sln.iml
 *.DotSettings.user
 
-# Visual Studio Code
-.vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# Visual Studio Code — share settings/tasks/launch/extensions (repo root AND per project,
+# since the bootstrap scripts generate them); ignore everything else in .vscode.
+# Must be `.vscode/*`, not `.vscode/`: git can't re-include files inside an excluded directory.
+**/.vscode/*
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+# The shared multi-root workspace is committed; personal ones are not.
 *.code-workspace
+!/ai-learn.code-workspace
 .history/
 
 # Python
@@ -95,8 +111,12 @@ htmlcov/
 .tox/
 .nox/
 .ipynb_checkpoints/
-.python-version
+.pyre/
+.pytype/
+.dmypy.json
+*.so
 pip-log.txt
+# .python-version and uv.lock ARE committed: they pin the interpreter and deps (like global.json + packages.lock.json).
 
 # Python packaging / env managers
 Pipfile.lock
@@ -158,6 +178,10 @@ pnpm-debug.log*
 checkpoints/
 models/
 weights/
+adapter/
+merged/
+# Includes SentencePiece tokenizer .model files: downloaded artifacts, like weights. Commit small
+# ones a test needs under fixtures/ (re-included at the end of this file).
 *.model
 
 # Datasets & large data (track with DVC / Git LFS / S3, not git)
@@ -176,11 +200,25 @@ processed/
 *.tar.gz
 *.tgz
 *.gz
-# Keep small sample/fixture data that IS meant to be committed:
-!**/sample/**
-!**/samples/**
-!**/fixtures/**
-!**/test_data/**
+# (Committed sample/fixture data is re-included at the END of this file.)
+
+# ...but not source folders that share names with the model/data ignores above. With
+# core.ignorecase=true (the Windows default), `models/` and `data/` would otherwise swallow
+# .NET `Models/` (DTOs) and `Data/` (EF DbContext) folders, or a Python `data` subpackage.
+# Must come after those patterns: the last matching rule wins.
+# src/ is the library shape and the C# layout; app/ and eval/ are the Python Service shape.
+!**/src/**/[Mm]odels/
+!**/src/**/[Dd]ata/
+!**/src/**/[Aa]dapter/
+!**/src/**/[Pp]rocessed/
+!**/src/**/[Bb]uild/
+!**/app/**/[Mm]odels/
+!**/app/**/[Dd]ata/
+!**/app/**/[Pp]rocessed/
+!**/eval/**/[Mm]odels/
+!**/eval/**/[Dd]ata/
+!**/tests/**/[Mm]odels/
+!**/tests/**/[Dd]ata/
 
 # Hugging Face / model & dataset caches
 .cache/huggingface/
@@ -254,3 +292,26 @@ cdk.out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Module 12's baked RAG index: a build artifact, rebuilt at image build time
+projects/12-aws-deploy/index/
+
+# Mutation and property-testing scratch (R track: mutmut, hypothesis)
+mutants/
+.hypothesis/
+
+# --- Committed data (keep LAST) ---
+# Small sample/fixture data that IS meant to be committed. Each project's shared datasets live
+# in projects/<NN>-<name>/fixtures/ (see docs/00). This block must stay at the end: the last
+# matching rule wins, so placed earlier, later rules like `outputs/` or `runs/` would re-ignore
+# folders inside fixtures/.
+!**/sample/**
+!**/samples/**
+!**/fixtures/**
+!**/test_data/**
+# The review track's journal is a committed learning record (docs/R-reviewing-ai-written-code.md).
+!projects/review-lab/journal/
+!projects/review-lab/journal/**
+# ...and so are its calibration labels (R track, "Rubric and agreement").
+!projects/review-lab/rubric/labels/
+!projects/review-lab/rubric/labels/**
