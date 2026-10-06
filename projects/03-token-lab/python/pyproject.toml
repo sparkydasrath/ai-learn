@@ -18,7 +18,9 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "pyright>=1.1.414",
     "pytest>=9.1.1",
+    "ruff>=0.16.10",
 ]
 
 # sentence-transformers pulls in torch. From PyPI that's the CUDA build on Linux (several GB in
@@ -31,3 +33,11 @@ explicit = true
 
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+# pyflakes, pycodestyle, isort, bugbear, pyupgrade
+select = ["E", "F", "I", "B", "UP"]

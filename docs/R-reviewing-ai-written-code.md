@@ -98,7 +98,7 @@ New models ship every few months, and "which is better?" depends on the task. Ke
 
 **`projects/review-lab/`** is a long-lived lab that grows across the whole curriculum. It holds a failure-mode journal, a gameable-tests lab, written reviews and comparisons, a rubric with measured agreement, and model-release notes. Unlike the numbered projects, it has no single "done" date. It's your running evidence base.
 
-The folder already exists in the repo, and it's **behind this doc on purpose**: it holds what you've built so far (the journal and the start of the gameable-tests lab), not the finished lab. So expect gaps against the layout below: Python 3.11 rather than 3.12, no `hypothesis` or `mutmut` yet, no `test_median_strong.py`, Dockerfile, `rubric/`, `reviews/`, `comparisons/` or `model_notes/`, and a leftover `main.py` from `uv init`. Each one arrives at the stage in the [schedule](#schedule-alongside-the-curriculum) that needs it. When you catch up the Python version, set `requires-python = ">=3.12"` and run `uv python pin 3.12`, then delete `main.py`.
+The folder already exists in the repo, and it's **behind this doc on purpose**: it holds what you've built so far (the journal and the start of the gameable-tests lab), not the finished lab. So expect gaps against the layout below: no `hypothesis` or `mutmut` yet, no `test_median_strong.py`, Dockerfile, `rubric/`, `reviews/`, `comparisons/` or `model_notes/`. Each one arrives at the stage in the [schedule](#schedule-alongside-the-curriculum) that needs it. (The Python version is already caught up to 3.12, and `uv init`'s leftover `main.py` is gone.)
 
 ### Layout
 

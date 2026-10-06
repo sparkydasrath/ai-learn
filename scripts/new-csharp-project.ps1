@@ -14,9 +14,11 @@ param(
 
   [switch]$SkipTests,
 
-  [switch]$RunBuild = $true,
+  # Skip the final dotnet build.
+  [switch]$NoBuild,
 
-  [switch]$AddToWorkspace = $true
+  # Don't add the folder to ai-learn.code-workspace.
+  [switch]$NoWorkspace
 )
 
 Set-StrictMode -Version Latest
@@ -140,7 +142,7 @@ New-Item -ItemType Directory -Path $vscodeDir -Force | Out-Null
 "@ | Set-Content -Path (Join-Path $vscodeDir "settings.json") -Encoding UTF8
 
 # 8) Optional restore + build so the scaffold is known-good before you write code.
-if ($RunBuild) {
+if (-not $NoBuild) {
   Push-Location $projectDir
   try {
     Invoke-Dotnet build
@@ -151,7 +153,7 @@ if ($RunBuild) {
 }
 
 # 9) Optionally add this folder to the workspace file.
-if ($AddToWorkspace -and (Test-Path $workspaceFile)) {
+if (-not $NoWorkspace -and (Test-Path $workspaceFile)) {
   $workspaceJson = Get-Content $workspaceFile -Raw | ConvertFrom-Json
   $relativePath = "projects/$ProjectName/csharp"
   $alreadyPresent = $false
@@ -179,6 +181,6 @@ $env:AI_LEARN_PROJECT = $ProjectName
 
 Write-Host "Created project: $projectDir"
 Write-Host "Solution: $($solutionFile.Name) | Template: $Template | Framework: $Framework | NUnit tests: $(-not $SkipTests)"
-Write-Host "Built: $RunBuild | Added to workspace: $AddToWorkspace"
+Write-Host "Built: $(-not $NoBuild) | Added to workspace: $(-not $NoWorkspace)"
 Write-Host "AI_LEARN_PROJECT persisted for future terminals (User scope): $ProjectName"
 Write-Host "If you ran this via 'pwsh ./scripts/new-csharp-project.ps1 ...', run this in your current shell now: `n`$env:AI_LEARN_PROJECT = `"$ProjectName`""

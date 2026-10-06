@@ -6,6 +6,7 @@ from token_lab.cost import ModelPrice, estimate_cost
 from token_lab.embeddings import similarity
 from token_lab.tokens import count_tokens
 
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Token / cost / similarity lab.")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -14,7 +15,7 @@ def main(argv: list[str] | None = None) -> int:
     p_tok.add_argument("text")
 
     p_cost = sub.add_parser("cost", help="Estimate cost for token counts.")
-    p_cost.add_argument("--in-tokens", type=int, required=True) 
+    p_cost.add_argument("--in-tokens", type=int, required=True)
     p_cost.add_argument("--out-tokens", type=int, required=True)
     p_cost.add_argument("--in-price", type=float, required=True, help="$ / 1K input tokens")
     p_cost.add_argument("--out-price", type=float, required=True, help="$ / 1K output tokens")
@@ -34,6 +35,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.cmd == "sim":
         print(f"cosine similarity: {similarity(args.a, args.b):.4f}")
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -1,13 +1,9 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "textstats"
 version = "0.1.0"
-description = "Add your description here"
+description = "Module 01: text statistics CLI, a typed and tested Python warm-up."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.13.5",
 ]
@@ -22,10 +18,8 @@ dev = [
 [project.scripts]
 textstats = "textstats.cli:main"
 
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-
 [tool.ruff]
+target-version = "py312"
 line-length = 100
 
 [tool.ruff.lint]
@@ -34,3 +28,7 @@ select = ["E", "F", "I", "B", "UP"]
 
 [tool.pyright]
 typeCheckingMode = "strict"  # treat it like <Nullable>enable</Nullable> and then some
+
+[build-system]
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"

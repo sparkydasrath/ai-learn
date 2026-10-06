@@ -60,17 +60,20 @@ Use the same name for both languages so they land in the same `projects/<NN>-<na
 
 Given a project name like `04-my-new-project`, the script will:
 
-1. Run `uv init` into `projects/04-my-new-project/python/` with your selected mode and Python version. It passes `--name` with the `NN-` prefix dropped (`04-my-new-project` → package `my-new-project`, module `my_new_project`), so the package isn't named after the `python` folder and the module name is a valid Python identifier.
-2. Lay out the code for the chosen [project shape](conventions.md#python-project-shapes):
-   - `package` (library, the default): `uv init --package` creates `src/<module>/` and a `[build-system]` using `uv_build`, so the project installs itself.
+1. Check the name before creating anything. The module name must not be a standard-library module (`04-json` would shadow `json`) or a Python keyword.
+2. Run `uv init` into `projects/04-my-new-project/python/` with your selected mode, Python version and description, plus `--vcs none` (no nested git repo) and `--author-from none` (your git name and email aren't copied in). It passes `--name` with the `NN-` prefix dropped (`04-my-new-project` → package `my-new-project`, module `my_new_project`), so the package isn't named after the `python` folder and the module name is a valid Python identifier. `requires-python` follows `-PythonVersion`.
+3. Lay out the code for the chosen [project shape](conventions.md#python-project-shapes):
+   - `package` (library, the default): `uv init --package` creates `src/<module>/` and a `[build-system]` using `uv_build`, so the project installs itself. The script replaces uv's hello-world `main()` with a docstring, adds `py.typed`, and removes the placeholder `[project.scripts]` entry. A module that has a CLI adds its own.
    - `app` (service): creates `app/__init__.py` at the root, deletes `uv init`'s hello-world `main.py`, and adds `[tool.pytest.ini_options] pythonpath = ["."]` so tests can `import app`. No build system; it's never installed.
-3. Create `tests/`, and write `pyrightconfig.json` so Pylance resolves imports from `src` (or the root, for `app`) in tests.
-4. Write `Dockerfile.dockerignore` (`.venv/`, caches, `outputs/`, `bin/`, `obj/`, all as `**/` patterns, so it works whatever the build context).
-5. Optionally add pytest as a dev dependency (`uv add --dev pytest --no-sync`) and create `tests/test_smoke.py`.
-6. Create `.vscode/settings.json` with the per-project interpreter and import path.
-7. Optionally create `.venv` and run `uv sync`. With `-CreateVenv:$false`, no `.venv` is created at all.
-8. Optionally append `projects/04-my-new-project/python` to `ai-learn.code-workspace`.
-9. Set `AI_LEARN_PROJECT` (see [environment settings](env-settings.md#the-active-project)).
+4. Create `tests/`. Write `pyrightconfig.json`, which is the **only** place pyright settings live: `pythonVersion`, `typeCheckingMode` (standard), and the import paths for `src` (or the root, for `app`). When this file exists, pyright and Pylance ignore `[tool.pyright]` and the VS Code `typeCheckingMode` setting, so the script writes neither. Add a `[tool.ruff]` section to `pyproject.toml` (target version from `-PythonVersion`, the module 01 rule set).
+5. Write `Dockerfile.dockerignore` (`.venv/`, caches, `outputs/`, `bin/`, `obj/`, all as `**/` patterns, so it works whatever the build context).
+6. Add `ruff` and `pyright` as dev dependencies, plus `pytest` unless you pass `-SkipPytest` (`uv add --dev --no-sync`). Write `tests/test_smoke.py`. For a library, it checks the package is *installed* (`importlib.metadata.version`); for a service, that `app` imports.
+7. Create `.vscode/settings.json` with the per-project interpreter, import path and pytest settings.
+8. Run `uv sync` (which creates `.venv`), then `ruff format`, `ruff check`, `pyright` and `pytest`, so the project starts green. `-NoSync` skips all of it.
+9. Append `projects/04-my-new-project/python` to `ai-learn.code-workspace`, unless you pass `-NoWorkspace`.
+10. Set `AI_LEARN_PROJECT` (see [environment settings](env-settings.md#the-active-project)).
+
+If any step fails, the script deletes what it created (the `python/` folder, and the project folder too if it made it; an existing `csharp/` sibling is left alone), restores `ai-learn.code-workspace`, and stops with the error.
 
 ### Parameters
 
@@ -82,10 +85,12 @@ Optional:
 
 - `-PythonVersion` (default: 3.12)
 - `-Mode app|package` (default: package)
-- `-SkipPytest`
-- `-CreateVenv` (default: true)
-- `-RunSync` (default: true)
-- `-AddToWorkspace` (default: true)
+- `-Description "..."` (default: `Module NN: <name>.`)
+- `-SkipPytest`: no pytest and no smoke test. ruff and pyright are still added.
+- `-NoSync`: write the files only. No `.venv`, no `uv sync`, no checks.
+- `-NoWorkspace`: don't add the folder to `ai-learn.code-workspace`.
+
+Every switch is off by default, so you only type the ones you want.
 
 ### Usage
 
@@ -105,13 +110,17 @@ Skip pytest setup:
 
     pwsh ./scripts/new-python-project.ps1 -ProjectName 06-fast-scratch -SkipPytest
 
-Do not create venv or sync yet:
+With a description:
 
-    pwsh ./scripts/new-python-project.ps1 -ProjectName 07-later-setup -CreateVenv:$false -RunSync:$false
+    pwsh ./scripts/new-python-project.ps1 -ProjectName 04-llm-client -Description "Module 04: one client for stub, Ollama and hosted models."
+
+Files only (no venv, no sync, no checks):
+
+    pwsh ./scripts/new-python-project.ps1 -ProjectName 07-later-setup -NoSync
 
 Do not update workspace file:
 
-    pwsh ./scripts/new-python-project.ps1 -ProjectName 08-experiment -AddToWorkspace:$false
+    pwsh ./scripts/new-python-project.ps1 -ProjectName 08-experiment -NoWorkspace
 
 ### Generated VS Code settings
 
@@ -120,6 +129,7 @@ Each Python project gets:
 - `python.defaultInterpreterPath = ${workspaceFolder}/.venv/Scripts/python.exe`
 - `python.analysis.extraPaths = [${workspaceFolder}/src]` (or `[${workspaceFolder}]` for `-Mode app`)
 - pytest enabled with `tests` as default target
+- no `typeCheckingMode`: that's set in `pyrightconfig.json`
 
 This avoids cross-project import bleed and keeps Pylance resolution local.
 
@@ -136,8 +146,8 @@ Given a project name like `04-my-new-project`, the script will:
 5. Write `Dockerfile.dockerignore` (`bin/`, `obj/`, `.vs/`, `models/`, `.venv/`, as `**/` patterns) so local build output and downloaded model files stay out of the build context. BuildKit reads it from next to the Dockerfile whatever the context is: `csharp/`, the project root, or `projects/` ([Docker conventions](conventions.md#docker)).
 6. Write a `README.md` with the everyday `dotnet build` / `test` / `run` commands.
 7. Create `.vscode/settings.json` pointing C# Dev Kit at the solution (`dotnet.defaultSolution`).
-8. Optionally run `dotnet build`, so the scaffold is known to build before you write code.
-9. Optionally append `projects/04-my-new-project/csharp` to `ai-learn.code-workspace`.
+8. Run `dotnet build`, so the scaffold is known to build before you write code (`-NoBuild` skips it).
+9. Append `projects/04-my-new-project/csharp` to `ai-learn.code-workspace`, unless you pass `-NoWorkspace`.
 10. Set `AI_LEARN_PROJECT`.
 
 Any `dotnet` command that fails stops the script with its exit code. It won't carry on with a half-built scaffold.
@@ -154,8 +164,8 @@ Optional:
 - `-Framework` (default: net10.0)
 - `-Template console|classlib|webapi` (default: console)
 - `-SkipTests`
-- `-RunBuild` (default: true)
-- `-AddToWorkspace` (default: true)
+- `-NoBuild`: skip the final `dotnet build`.
+- `-NoWorkspace`: don't add the folder to `ai-learn.code-workspace`.
 
 ### Usage
 
@@ -169,7 +179,7 @@ A web API with an explicit solution name:
 
 A class library without tests, without building yet:
 
-    pwsh ./scripts/new-csharp-project.ps1 -ProjectName 08-experiment -Template classlib -SkipTests -RunBuild:$false
+    pwsh ./scripts/new-csharp-project.ps1 -ProjectName 08-experiment -Template classlib -SkipTests -NoBuild
 
 ### What you get
 
@@ -231,7 +241,7 @@ Task does not appear in Tasks: Run Task:
 
 New project not appearing in Explorer:
 
-- If AddToWorkspace was disabled, add the language folder (e.g. `projects/04-my-new-project/csharp`) to `ai-learn.code-workspace` manually.
+- If you passed `-NoWorkspace`, add the language folder (e.g. `projects/04-my-new-project/csharp`) to `ai-learn.code-workspace` manually.
 - If enabled, reload the window if Explorer does not refresh immediately.
 
 ## Suggested workflow
